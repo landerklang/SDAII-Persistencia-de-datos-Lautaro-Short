@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Registro de Alumnos</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #74ebd5, #acb6e5);
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      h2 {
+        text-align: center;
+      }
+
+      input {
+        width: calc(100% - 12px);
+        margin: 5px 0;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background: #45a049;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+
+      th {
+        background: #4caf50;
+        color: white;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Agregar Alumno</h2>
+
+      <input type="text" id="nombre" placeholder="Nombre" />
+      <input type="number" id="edad" placeholder="Edad" />
+      <input type="number" id="nota" placeholder="Nota" />
+      <button onclick="agregarAlumno()">Agregar</button>
+
+      <h2>Lista de Alumnos</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Edad</th>
+            <th>Nota</th>
+          </tr>
+        </thead>
+        <tbody id="tablaAlumnos"></tbody>
+      </table>
+    </div>
+
+    <script>
+      async function cargarAlumnos() {
+        const res = await fetch("/api/alumnos");
+        const alumnos = await res.json();
+        mostrarAlumnos(alumnos);
+      }
+
+      async function agregarAlumno() {
+        const nombre = document.getElementById("nombre").value;
+        const edad = parseInt(document.getElementById("edad").value);
+        const nota = parseFloat(document.getElementById("nota").value);
+
+        if (!nombre || isNaN(edad) || isNaN(nota)) {
+          alert("Complete todos los campos");
+          return;
+        }
+
+        const res = await fetch("/api/alumnos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nombre, edad, nota }),
+        });
+
+        const alumnos = await res.json();
+        mostrarAlumnos(alumnos);
+      }
+
+      function mostrarAlumnos(alumnos) {
+        const tabla = document.getElementById("tablaAlumnos");
+        tabla.innerHTML = "";
+
+        alumnos.forEach((alumno) => {
+          const fila = `<tr>
+          <td>${alumno.nombre}</td>
+          <td>${alumno.edad}</td>
+          <td>${alumno.nota}</td>
+        </tr>`;
+          tabla.innerHTML += fila;
+        });
+      }
+
+      window.onload = cargarAlumnos;
+    </script>
+  </body>
+</html>
